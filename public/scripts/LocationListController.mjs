@@ -77,9 +77,16 @@ export class LocationListController {
     
     card.innerHTML = `
       <h3>${location.name}</h3>
-      <p>State: ${location.state}</p>
-      <p>Total Energy: ${totalEnergy.toFixed(2)} KWh/day</p>
-      <p>Appliances: ${applianceCount}</p>
+      <div class="state-badge">${location.state}</div>
+      
+      <div class="energy-info">
+        Daily Energy: <span class="energy-value">${totalEnergy > 0 ? totalEnergy.toFixed(2) + ' kWh' : 'NaN kWh'}</span>
+      </div>
+      
+      <div class="appliance-count">
+        ${applianceCount} Appliance${applianceCount !== 1 ? 's' : ''}
+      </div>
+      
       <div class="card-actions">
         <button class="edit-button" data-id="${location.id}">Edit</button>
         <button class="stats-button" data-id="${location.id}">Statistics</button>
