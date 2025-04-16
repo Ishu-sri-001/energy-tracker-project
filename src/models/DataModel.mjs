@@ -6,19 +6,13 @@ export class DataModel {
       Object.assign(this, data);
     }
   
-    /**
-     * Convert model to JSON string
-     * @returns {string} JSON representation of the model
-     */
+    
+     // Convert model to JSON string
     toJSON() {
       return JSON.stringify(this);
     }
   
-    /**
-     * Create model from JSON string
-     * @param {string} json - JSON string
-     * @returns {DataModel} New model instance
-     */
+     // Create model from JSON string
     static fromJSON(json) {
       try {
         const data = JSON.parse(json);

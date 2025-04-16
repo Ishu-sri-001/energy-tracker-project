@@ -1,12 +1,6 @@
-/**
- * Controller for national energy sources
- */
+
 export class NationalSourcesController {
-    /**
-     * Get all available states with their energy source distributions
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
-     */
+    
     static getStates(req, res) {
       const states = [
         {

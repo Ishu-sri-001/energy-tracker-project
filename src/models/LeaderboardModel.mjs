@@ -1,22 +1,7 @@
 import { DataModel } from './DataModel.mjs';
 
-/**
- * Model representing a leaderboard entry
- */
 export class LeaderboardModel extends DataModel {
-  /**
-   * @param {Object} data - Leaderboard entry data
-   * @param {string} data.id - Unique identifier
-   * @param {string} data.locationName - Location name
-   * @param {string} data.state - State name
-   * @param {number} data.totalEnergy - Total energy usage in KWh per day
-   * @param {Object} data.energyBySource - Energy usage by source
-   * @param {number} data.energyBySource.wind - Wind energy in KWh
-   * @param {number} data.energyBySource.solar - Solar energy in KWh
-   * @param {number} data.energyBySource.gas - Gas energy in KWh
-   * @param {number} data.energyBySource.coal - Coal energy in KWh
-   * @param {number} data.renewablePercentage - Percentage of renewable energy
-   */
+  
   constructor(data = {}) {
     super({
       id: data.id || crypto.randomUUID(),
@@ -34,10 +19,7 @@ export class LeaderboardModel extends DataModel {
     });
   }
 
-  /**
-   * Calculate renewable energy percentage
-   * @returns {number} Percentage of renewable energy
-   */
+// Calculate renewable energy percentage 
   calculateRenewablePercentage() {
     if (this.totalEnergy === 0) return 0;
     

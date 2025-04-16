@@ -1,6 +1,5 @@
 import { LocationModel } from './LocationModel.mjs';
 
-
 export class LocationEditController {
   constructor() {
     this.locationId = this.getLocationIdFromUrl();
@@ -20,9 +19,7 @@ export class LocationEditController {
     this.init();
   }
 
-  /**
-   * Initialize the controller
-   */
+ 
   async init() {
     try {
       // Load states and appliance types
@@ -59,25 +56,21 @@ export class LocationEditController {
     }
   }
 
-  /**
-   * Get location ID from URL
-   * @returns {string|null} Location ID or null if creating new location
-   */
+
+   // Get location ID from URL - returns {string|null} : Location ID or null if creating new location   
   getLocationIdFromUrl() {
     const path = window.location.pathname;
     const match = path.match(/\/location\/edit\/([^\/]+)/);
     return match ? match[1] : null;
   }
 
-  /**
-   * Load states 
-   */
+
   async loadStates() {
     try {
       console.log('Loading states...');
       
-      // Hardcoded states 
-      const fallbackStates = [
+      //  states
+      const states = [
         { state: 'Queensland' },
         { state: 'New South Wales' },
         { state: 'Victoria' },
@@ -88,21 +81,6 @@ export class LocationEditController {
         { state: 'Australian Capital Territory' }
       ];
       
-      let states;
-      
-      try {
-        const response = await fetch('/api/national/states');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        states = await response.json();
-        console.log('States loaded from API:', states);
-      } catch (fetchError) {
-        console.warn('Failed to fetch states from API, using fallback:', fetchError);
-        states = fallbackStates;
-      }
-      
-      // Clear select options
       this.stateSelect.innerHTML = '<option value="">Select a state</option>';
       
       // Add state options
@@ -117,15 +95,14 @@ export class LocationEditController {
     }
   }
 
-  /**
-   * Load appliance types from API
-   */
+  
+   // Load appliance types 
   async loadApplianceTypes() {
     try {
       console.log('Loading appliance types...');
       
-      // Hardcoded appliance types as fallback
-      const fallbackTypes = [
+      //  appliance types
+      const types = [
         { type: 'Refrigerator', energyPerHour: 0.15 },
         { type: 'Air Conditioner', energyPerHour: 1.5 },
         { type: 'Television', energyPerHour: 0.1 },
@@ -138,21 +115,6 @@ export class LocationEditController {
         { type: 'Lighting', energyPerHour: 0.06 }
       ];
       
-      let types;
-      
-      try {
-        const response = await fetch('/api/appliances/types');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        types = await response.json();
-        console.log('Appliance types loaded from API:', types);
-      } catch (fetchError) {
-        console.warn('Failed to fetch appliance types from API, using fallback:', fetchError);
-        types = fallbackTypes;
-      }
-      
-      // Clear select options
       this.applianceTypeSelect.innerHTML = '<option value="">Select an appliance type</option>';
       
       // Add type options
@@ -168,9 +130,8 @@ export class LocationEditController {
     }
   }
 
-  /**
-   * Load location data
-   */
+  
+   // Load location data
   loadLocation() {
     this.location = LocationModel.getById(this.locationId);
     
@@ -188,9 +149,8 @@ export class LocationEditController {
     this.renderAppliances();
   }
 
-  /**
-   * Render appliances
-   */
+  
+   
   renderAppliances() {
     // Clear current list
     this.applianceList.innerHTML = '';
@@ -207,11 +167,7 @@ export class LocationEditController {
     });
   }
 
-  /**
-   * Create an appliance item element
-   * @param {Object} appliance - Appliance data
-   * @returns {HTMLElement} Appliance item element
-   */
+  
   createApplianceItem(appliance) {
     const item = document.createElement('div');
     item.className = 'appliance-item';
@@ -239,9 +195,8 @@ export class LocationEditController {
     return item;
   }
 
-  /**
-   * Handle add appliance button click
-   */
+
+   // Handle add appliance button click
   handleAddAppliance() {
     // Get form values
     const typeOption = this.applianceTypeSelect.options[this.applianceTypeSelect.selectedIndex];
@@ -292,18 +247,13 @@ export class LocationEditController {
     this.renderAppliances();
   }
 
-  /**
-   * Handle delete appliance button click
-   * @param {string} id - Appliance ID
-   */
+ 
   handleDeleteAppliance(id) {
     this.location.removeAppliance(id);
     this.renderAppliances();
   }
 
-  /**
-   * Handle save button click
-   */
+ 
   handleSave() {
     // Get form values
     const name = this.nameInput.value.trim();
@@ -331,16 +281,14 @@ export class LocationEditController {
     window.location.href = '/';
   }
 
-  /**
-   * Handle back button click
-   */
+  
+   // Handle back button click
+   
   handleBack() {
     window.location.href = '/';
   }
   
-  /**
-   * Handle delete button click
-   */
+  
   handleDelete() {
     console.log('Delete button clicked for location ID:', this.locationId);
     

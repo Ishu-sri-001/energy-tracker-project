@@ -1,17 +1,9 @@
 import { LeaderboardModel } from '../models/LeaderboardModel.mjs';
 
-/**
- * Controller for national statistics
- */
+
 export class NationalStatsController {
-  /**
-   * Get aggregated national statistics from leaderboard data
-   * @param {Object} req - Request object
-   * @param {Object} res - Response object
-   */
   static getNationalStats(req, res) {
     try {
-      // In a real application, this would fetch from a database
       const leaderboardJson = process.leaderboardData || '[]';
       const leaderboard = JSON.parse(leaderboardJson);
       

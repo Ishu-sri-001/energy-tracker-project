@@ -2,11 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Import controllers directly for API endpoints
-import { ApplianceController } from './src/controllers/ApplianceController.mjs';
-import { NationalSourcesController } from './src/controllers/NationalSources.mjs';
-import { NationalStatsController } from './src/controllers/NationalStatsController.mjs';
-import { LeaderboardController } from './src/controllers/LeaderboardController.mjs';
+
 
 // Initialize express app
 const app = express();
@@ -36,20 +32,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error', message: err.message });
 });
 
-// API Routes - Direct controller usage
-app.get('/api/appliances/types', ApplianceController.getApplianceTypes);
-app.post('/api/appliances', ApplianceController.createAppliance);
-
-app.get('/api/national/states', NationalSourcesController.getStates);
-app.get('/api/national/states/:state', NationalSourcesController.getStateSourceDistribution);
-app.get('/api/national/stats', NationalStatsController.getNationalStats);
-
-app.get('/api/leaderboard', LeaderboardController.getLeaderboard);
-app.post('/api/leaderboard', LeaderboardController.addLeaderboardEntry);
-app.put('/api/leaderboard/:id', LeaderboardController.updateLeaderboardEntry);
-app.delete('/api/leaderboard/:id', LeaderboardController.deleteLeaderboardEntry);
-
-// View Routes - These must come AFTER the API routes
+// View Routes
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'views', 'location_list.html'));
 });

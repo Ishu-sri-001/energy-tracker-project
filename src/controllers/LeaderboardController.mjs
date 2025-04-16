@@ -1,15 +1,9 @@
-/**
- * Controller for leaderboard operations
- */
+
 export class LeaderboardController {
-  /**
-   * Get all leaderboard entries
-   * @param {Object} req - Request object
-   * @param {Object} res - Response object
-   */
+
   static getLeaderboard(req, res) {
     try {
-      // In a real application, this would fetch from a database
+     
       const leaderboardJson = process.leaderboardData || '[]';
       let leaderboard = JSON.parse(leaderboardJson);
       
@@ -23,11 +17,8 @@ export class LeaderboardController {
     }
   }
 
-  /**
-   * Add a new leaderboard entry
-   * @param {Object} req - Request object
-   * @param {Object} res - Response object
-   */
+  
+   // Add a new leaderboard entry 
   static addLeaderboardEntry(req, res) {
     try {
       console.log('Adding leaderboard entry, received data:', req.body);
@@ -75,7 +66,6 @@ export class LeaderboardController {
       
       console.log('Processed entry:', entry);
       
-      // In a real application, this would save to a database
       let leaderboard = [];
       try {
         const leaderboardJson = process.leaderboardData || '[]';
@@ -96,16 +86,11 @@ export class LeaderboardController {
     }
   }
 
-  /**
-   * Update a leaderboard entry
-   * @param {Object} req - Request object
-   * @param {Object} res - Response object
-   */
+   // Update a leaderboard entry
   static updateLeaderboardEntry(req, res) {
     try {
       const { id } = req.params;
-      
-      // In a real application, this would update in a database
+    
       let leaderboard = [];
       try {
         const leaderboardJson = process.leaderboardData || '[]';
@@ -138,16 +123,11 @@ export class LeaderboardController {
     }
   }
 
-  /**
-   * Delete a leaderboard entry
-   * @param {Object} req - Request object
-   * @param {Object} res - Response object
-   */
+   // Delete a leaderboard entry
   static deleteLeaderboardEntry(req, res) {
     try {
       const { id } = req.params;
       
-      // In a real application, this would delete from a database
       let leaderboard = [];
       try {
         const leaderboardJson = process.leaderboardData || '[]';

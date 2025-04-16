@@ -1,15 +1,5 @@
-/**
- * Client-side model for location data
- */
+
 export class LocationModel {
-    /**
-     * @param {Object} data - Location data
-     * @param {string} data.id - Unique identifier
-     * @param {string} data.name - Location name
-     * @param {string} data.state - State name
-     * @param {Array} data.appliances - Array of appliances
-     * @param {number} data.totalEnergy - Total energy usage
-     */
     constructor(data = {}) {
       this.id = data.id || crypto.randomUUID();
       this.name = data.name || '';
@@ -18,9 +8,8 @@ export class LocationModel {
       this.totalEnergy = data.totalEnergy || 0;
     }
   
-    /**
-     * Save location to localStorage
-     */
+    
+     // Save location to localStorage 
     save() {
       const locations = LocationModel.getAll();
       const index = locations.findIndex(loc => loc.id === this.id);
@@ -34,10 +23,8 @@ export class LocationModel {
       localStorage.setItem('locations', JSON.stringify(locations));
     }
   
-    /**
-     * Calculate total energy usage
-     * @returns {number} Total energy usage in KWh per day
-     */
+    
+     // Calculate total energy usage- returns Total energy usage in KWh per day 
     calculateTotalEnergy() {
       this.totalEnergy = this.appliances.reduce((total, appliance) => {
         return total + (appliance.quantity * appliance.hoursPerDay * appliance.energyPerHour);
@@ -45,49 +32,37 @@ export class LocationModel {
       return this.totalEnergy;
     }
   
-    /**
-     * Add an appliance to the location
-     * @param {Object} appliance - Appliance to add
-     */
+    
+     // Add an appliance to the location 
     addAppliance(appliance) {
       this.appliances.push(appliance);
       this.calculateTotalEnergy();
     }
   
-    /**
-     * Remove an appliance from the location
-     * @param {string} applianceId - ID of appliance to remove
-     */
+    
+     // Remove an appliance from the location -return ID of appliance to remove 
     removeAppliance(applianceId) {
       this.appliances = this.appliances.filter(app => app.id !== applianceId);
       this.calculateTotalEnergy();
     }
   
-    /**
-     * Get all locations from localStorage
-     * @returns {Array} Array of location objects
-     */
+    
+     // Get all locations from localStorage - returns Array of location objects 
     static getAll() {
       const locationsJson = localStorage.getItem('locations');
       return locationsJson ? JSON.parse(locationsJson) : [];
     }
   
-    /**
-     * Get a location by ID
-     * @param {string} id - Location ID
-     * @returns {LocationModel|null} Location object or null if not found
-     */
+    
+     // Get a location by ID 
     static getById(id) {
       const locations = LocationModel.getAll();
       const locationData = locations.find(loc => loc.id === id);
       return locationData ? new LocationModel(locationData) : null;
     }
   
-    /**
-     * Delete a location by ID
-     * @param {string} id - Location ID
-     * @returns {boolean} True if location was deleted, false otherwise
-     */
+    
+     // Delete a location by ID 
     static deleteById(id) {
       console.log('Attempting to delete location with ID:', id);
       
@@ -105,11 +80,9 @@ export class LocationModel {
       return false;
     }
   
-    /**
-     * Search locations by name
-     * @param {string} query - Search query
-     * @returns {Array} Array of matching location objects
-     */
+    
+     // Search locations by name
+     
     static search(query) {
       if (!query) return LocationModel.getAll();
       

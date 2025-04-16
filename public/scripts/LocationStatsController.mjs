@@ -1,8 +1,5 @@
 import { LocationModel } from './LocationModel.mjs';
 
-/**
- * Controller for the location statistics view
- */
 export class LocationStatsController {
   constructor() {
     this.locationId = this.getLocationIdFromUrl();
@@ -19,9 +16,6 @@ export class LocationStatsController {
     this.init();
   }
 
-  /**
-   * Initialize the controller
-   */
   init() {
     // Load location data
     if (this.locationId) {
@@ -36,18 +30,15 @@ export class LocationStatsController {
     this.backButton.addEventListener('click', () => this.handleBack());
   }
 
-  /**
-   * Get location ID from URL
-   * @returns {string|null} Location ID
-   */
+  
+   // Get location ID from URL - returns : {string|null} Location ID
   getLocationIdFromUrl() {
     const urlParts = window.location.pathname.split('/');
     return urlParts[urlParts.length - 1];
   }
 
-  /**
-   * Load location data
-   */
+  
+   // Load location data 
   async loadLocation() {
     this.location = LocationModel.getById(this.locationId);
     
@@ -67,15 +58,13 @@ export class LocationStatsController {
     this.calculateAndDisplayStatistics();
   }
 
-  /**
-   * Load state source distribution
-   */
+   // Load state source distribution
   async loadStateSourceDistribution() {
     try {
       console.log('Loading state source distribution for:', this.location.state);
-      
-      // Fallback data for state energy sources
-      const fallbackStateData = {
+    
+      // Hardcoded state energy sources
+      const stateSourceData = {
         'Queensland': { wind: 10, solar: 20, gas: 25, coal: 45 },
         'New South Wales': { wind: 15, solar: 15, gas: 30, coal: 40 },
         'Victoria': { wind: 20, solar: 10, gas: 40, coal: 30 },
@@ -86,32 +75,16 @@ export class LocationStatsController {
         'Australian Capital Territory': { wind: 25, solar: 30, gas: 25, coal: 20 }
       };
       
-      try {
-        const response = await fetch(`/api/national/states/${encodeURIComponent(this.location.state)}`);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-          throw new Error('Response is not JSON');
-        }
-        
-        this.stateSourceDistribution = await response.json();
-        console.log('State source distribution loaded from API:', this.stateSourceDistribution);
-      } catch (fetchError) {
-        console.warn('Failed to fetch state source distribution from API, using fallback:', fetchError);
-        
-        // Use fallback data
-        const fallbackSources = fallbackStateData[this.location.state] || 
-                               { wind: 25, solar: 25, gas: 25, coal: 25 };
-        
-        this.stateSourceDistribution = {
-          state: this.location.state,
-          sources: fallbackSources
-        };
-      }
+      // Use the state data or default if not found
+      const sources = stateSourceData[this.location.state] || 
+                     { wind: 25, solar: 25, gas: 25, coal: 25 };
+      
+      this.stateSourceDistribution = {
+        state: this.location.state,
+        sources: sources
+      };
+      
+      console.log('Using state source distribution:', this.stateSourceDistribution);
     } catch (error) {
       console.error('Error loading state source distribution:', error);
       
@@ -123,9 +96,8 @@ export class LocationStatsController {
     }
   }
 
-  /**
-   * Calculate and display statistics
-   */
+
+   // Calculate and display statistics   
   calculateAndDisplayStatistics() {
     if (!this.location || !this.stateSourceDistribution) return;
     
@@ -161,13 +133,6 @@ export class LocationStatsController {
     this.createPieChart(sources);
   }
 
-  /**
-   * Create a source bar
-   * @param {string} name - Source name
-   * @param {number} energy - Energy in KWh
-   * @param {number} percentage - Percentage of total
-   * @param {string} color - Bar color
-   */
   createSourceBar(name, energy, percentage, color) {
     const sourceDiv = document.createElement('div');
     sourceDiv.className = 'energy-source';
@@ -183,10 +148,8 @@ export class LocationStatsController {
     this.energySourcesContainer.appendChild(sourceDiv);
   }
 
-  /**
-   * Create a pie chart
-   * @param {Object} sources - Energy source percentages
-   */
+
+   // Create a pie chart - param {Object} sources - Energy source percentages   
   createPieChart(sources) {
     const canvas = document.createElement('canvas');
     canvas.id = 'pie-chart';
@@ -243,9 +206,8 @@ export class LocationStatsController {
     this.statsContainer.appendChild(legendContainer);
   }
 
-  /**
-   * Handle post button click
-   */
+  
+   // Handle post button click
   handlePost() {
     if (!this.location || !this.stateSourceDistribution) return;
     
@@ -297,9 +259,8 @@ export class LocationStatsController {
     }
   }
 
-  /**
-   * Handle back button click
-   */
+  
+   // Handle back button click
   handleBack() {
     window.location.href = '/';
   }

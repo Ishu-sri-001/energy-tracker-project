@@ -1,8 +1,5 @@
 import { LocationModel } from './LocationModel.mjs';
 
-/**
- * Controller for the location list view
- */
 export class LocationListController {
   constructor() {
     this.searchInput = document.getElementById('search-input');
@@ -12,9 +9,7 @@ export class LocationListController {
     this.init();
   }
 
-  /**
-   * Initialize the controller
-   */
+
   init() {
     // Add event listeners
     this.searchInput.addEventListener('input', () => this.handleSearch());
@@ -24,25 +19,18 @@ export class LocationListController {
     this.renderLocations();
   }
 
-  /**
-   * Handle search input
-   */
+   // Handle search input
   handleSearch() {
     const query = this.searchInput.value;
     this.renderLocations(query);
   }
 
-  /**
-   * Handle create button click
-   */
+
+   // Handle create button click
   handleCreate() {
     window.location.href = '/location/edit/';
   }
 
-  /**
-   * Render locations based on search query
-   * @param {string} query - Search query
-   */
   renderLocations(query = '') {
     // Clear current list
     this.locationList.innerHTML = '';
@@ -62,11 +50,9 @@ export class LocationListController {
     });
   }
 
-  /**
-   * Create a location card element
-   * @param {Object} location - Location data
-   * @returns {HTMLElement} Location card element
-   */
+
+   // Create a location card element
+   
   createLocationCard(location) {
     const card = document.createElement('div');
     card.className = 'location-card';

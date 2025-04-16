@@ -1,12 +1,5 @@
-/**
- * Controller for appliance-related operations
- */
+
 export class ApplianceController {
-    /**
-     * Get all available appliance types
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
-     */
     static getApplianceTypes(req, res) {
       const applianceTypes = [
         { type: 'Refrigerator', energyPerHour: 0.15 },
@@ -24,11 +17,8 @@ export class ApplianceController {
       res.json(applianceTypes);
     }
   
-    /**
-     * Create a new appliance
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
-     */
+
+     // Create a new appliance
     static createAppliance(req, res) {
       try {
         const applianceData = req.body;
