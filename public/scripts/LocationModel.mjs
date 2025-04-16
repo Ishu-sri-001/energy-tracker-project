@@ -89,8 +89,13 @@ export class LocationModel {
      * @returns {boolean} True if location was deleted, false otherwise
      */
     static deleteById(id) {
+      console.log('Attempting to delete location with ID:', id);
+      
       const locations = LocationModel.getAll();
+      console.log('Before deletion, locations count:', locations.length);
+      
       const newLocations = locations.filter(loc => loc.id !== id);
+      console.log('After deletion, locations count:', newLocations.length);
       
       if (newLocations.length !== locations.length) {
         localStorage.setItem('locations', JSON.stringify(newLocations));

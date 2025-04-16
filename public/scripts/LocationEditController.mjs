@@ -1,8 +1,6 @@
 import { LocationModel } from './LocationModel.mjs';
 
-/**
- * Controller for the location edit view
- */
+
 export class LocationEditController {
   constructor() {
     this.locationId = this.getLocationIdFromUrl();
@@ -17,6 +15,7 @@ export class LocationEditController {
     this.addApplianceButton = document.getElementById('add-appliance-button');
     this.saveButton = document.getElementById('save-button');
     this.backButton = document.getElementById('back-button');
+    this.deleteButton = document.getElementById('delete-button');
     
     this.init();
   }
@@ -35,15 +34,26 @@ export class LocationEditController {
       // Load location data if editing existing location
       if (this.locationId) {
         this.loadLocation();
+        console.log('Editing location with ID:', this.locationId);
       } else {
         // Create new location
         this.location = new LocationModel();
+        
+        // Hide delete button for new locations
+        if (this.deleteButton) {
+          this.deleteButton.style.display = 'none';
+        }
       }
       
       // Add event listeners
       this.addApplianceButton.addEventListener('click', () => this.handleAddAppliance());
       this.saveButton.addEventListener('click', () => this.handleSave());
       this.backButton.addEventListener('click', () => this.handleBack());
+      
+      // Add delete button event listener
+      if (this.deleteButton) {
+        this.deleteButton.addEventListener('click', () => this.handleDelete());
+      }
     } catch (error) {
       console.error('Error initializing controller:', error);
     }
@@ -54,19 +64,19 @@ export class LocationEditController {
    * @returns {string|null} Location ID or null if creating new location
    */
   getLocationIdFromUrl() {
-    const urlParts = window.location.pathname.split('/');
-    const id = urlParts[urlParts.length - 1];
-    return id && id !== 'edit' ? id : null;
+    const path = window.location.pathname;
+    const match = path.match(/\/location\/edit\/([^\/]+)/);
+    return match ? match[1] : null;
   }
 
   /**
-   * Load states from API
+   * Load states 
    */
   async loadStates() {
     try {
       console.log('Loading states...');
       
-      // Hardcoded states as fallback
+      // Hardcoded states 
       const fallbackStates = [
         { state: 'Queensland' },
         { state: 'New South Wales' },
@@ -326,6 +336,30 @@ export class LocationEditController {
    */
   handleBack() {
     window.location.href = '/';
+  }
+  
+  /**
+   * Handle delete button click
+   */
+  handleDelete() {
+    console.log('Delete button clicked for location ID:', this.locationId);
+    
+    if (!this.locationId) {
+      console.error('No location ID found');
+      return;
+    }
+    
+    try {
+      // Delete the location
+      const deleted = LocationModel.deleteById(this.locationId);
+      console.log('Location deleted:', deleted);
+      
+      // Redirect to location list
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Error deleting location:', error);
+      alert('Failed to delete location: ' + error.message);
+    }
   }
 }
 
