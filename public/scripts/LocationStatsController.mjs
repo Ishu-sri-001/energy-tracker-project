@@ -246,7 +246,7 @@ export class LocationStatsController {
   /**
    * Handle post button click
    */
-  async handlePost() {
+  handlePost() {
     if (!this.location || !this.stateSourceDistribution) return;
     
     try {
@@ -256,41 +256,41 @@ export class LocationStatsController {
       // Calculate energy by source
       const sources = this.stateSourceDistribution.sources;
       const energyBySource = {
-        wind: (sources.wind / 100) * totalEnergy,
-        solar: (sources.solar / 100) * totalEnergy,
-        gas: (sources.gas / 100) * totalEnergy,
-        coal: (sources.coal / 100) * totalEnergy
+        wind: Math.round((sources.wind / 100) * totalEnergy * 100),
+        solar: Math.round((sources.solar / 100) * totalEnergy * 100),
+        gas: Math.round((sources.gas / 100) * totalEnergy * 100),
+        coal: Math.round((sources.coal / 100) * totalEnergy * 100)
       };
-      
-      // Calculate renewable percentage
-      const renewable = energyBySource.wind + energyBySource.solar;
-      const renewablePercentage = (renewable / totalEnergy) * 100;
       
       // Create leaderboard entry
       const entry = {
-        locationName: this.location.name,
+        id: crypto.randomUUID(),
         state: this.location.state,
-        totalEnergy,
-        energyBySource,
-        renewablePercentage
+        wind: energyBySource.wind,
+        solar: energyBySource.solar,
+        gas: energyBySource.gas,
+        coal: energyBySource.coal
       };
       
-      // Post to leaderboard
-      const response = await fetch('/api/leaderboard', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(entry)
-      });
-      
-      if (response.ok) {
-        alert('Posted to leaderboard successfully');
-        window.location.href = '/leaderboard';
-      } else {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to post to leaderboard');
+      // Get existing leaderboard data or create new array
+      let leaderboard = [];
+      try {
+        const leaderboardData = localStorage.getItem('leaderboard');
+        if (leaderboardData) {
+          leaderboard = JSON.parse(leaderboardData);
+        }
+      } catch (error) {
+        console.error('Error parsing leaderboard data:', error);
       }
+      
+      // Add new entry
+      leaderboard.push(entry);
+      
+      // Save to localStorage
+      localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+      
+      alert('Posted to leaderboard successfully');
+      window.location.href = '/leaderboard';
     } catch (error) {
       console.error('Error posting to leaderboard:', error);
       alert(`Failed to post to leaderboard: ${error.message}`);

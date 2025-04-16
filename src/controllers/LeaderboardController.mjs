@@ -1,5 +1,3 @@
-import { LeaderboardModel } from '../models/LeaderboardModel.mjs';
-
 /**
  * Controller for leaderboard operations
  */
@@ -15,14 +13,12 @@ export class LeaderboardController {
       const leaderboardJson = process.leaderboardData || '[]';
       let leaderboard = JSON.parse(leaderboardJson);
       
-      // Convert to LeaderboardModel instances
-      leaderboard = leaderboard.map(entry => new LeaderboardModel(entry));
-      
       // Sort by renewable percentage (highest first)
       leaderboard.sort((a, b) => b.renewablePercentage - a.renewablePercentage);
       
       res.json(leaderboard);
     } catch (error) {
+      console.error('Error in getLeaderboard:', error);
       res.status(500).json({ error: error.message });
     }
   }
@@ -34,22 +30,68 @@ export class LeaderboardController {
    */
   static addLeaderboardEntry(req, res) {
     try {
-      const entryData = req.body;
-      const entry = new LeaderboardModel(entryData);
+      console.log('Adding leaderboard entry, received data:', req.body);
       
-      // Calculate renewable percentage if not provided
-      if (!entry.renewablePercentage) {
-        entry.renewablePercentage = entry.calculateRenewablePercentage();
+      // Validate required fields
+      const requiredFields = ['locationName', 'state', 'totalEnergy', 'energyBySource', 'renewablePercentage'];
+      for (const field of requiredFields) {
+        if (req.body[field] === undefined) {
+          return res.status(400).json({ error: `Missing required field: ${field}` });
+        }
       }
       
+      // Validate energyBySource fields
+      const requiredSourceFields = ['wind', 'solar', 'gas', 'coal'];
+      for (const field of requiredSourceFields) {
+        if (req.body.energyBySource[field] === undefined) {
+          return res.status(400).json({ error: `Missing required energy source field: ${field}` });
+        }
+      }
+      
+      // Validate numeric fields
+      if (typeof req.body.totalEnergy !== 'number' || req.body.totalEnergy <= 0) {
+        return res.status(400).json({ error: 'totalEnergy must be a positive number' });
+      }
+      
+      if (typeof req.body.renewablePercentage !== 'number' || req.body.renewablePercentage < 0 || req.body.renewablePercentage > 100) {
+        return res.status(400).json({ error: 'renewablePercentage must be a number between 0 and 100' });
+      }
+      
+      // Create entry with only the necessary data
+      const entry = {
+        id: req.body.id || crypto.randomUUID(),
+        locationName: String(req.body.locationName),
+        state: String(req.body.state),
+        totalEnergy: Number(req.body.totalEnergy),
+        energyBySource: {
+          wind: Number(req.body.energyBySource.wind || 0),
+          solar: Number(req.body.energyBySource.solar || 0),
+          gas: Number(req.body.energyBySource.gas || 0),
+          coal: Number(req.body.energyBySource.coal || 0)
+        },
+        renewablePercentage: Number(req.body.renewablePercentage),
+        timestamp: req.body.timestamp || Date.now()
+      };
+      
+      console.log('Processed entry:', entry);
+      
       // In a real application, this would save to a database
-      const leaderboardJson = process.leaderboardData || '[]';
-      const leaderboard = JSON.parse(leaderboardJson);
+      let leaderboard = [];
+      try {
+        const leaderboardJson = process.leaderboardData || '[]';
+        leaderboard = JSON.parse(leaderboardJson);
+      } catch (parseError) {
+        console.error('Error parsing leaderboard data:', parseError);
+        process.leaderboardData = '[]';
+        leaderboard = [];
+      }
+      
       leaderboard.push(entry);
       process.leaderboardData = JSON.stringify(leaderboard);
       
       res.status(201).json(entry);
     } catch (error) {
+      console.error('Error in addLeaderboardEntry:', error);
       res.status(400).json({ error: error.message });
     }
   }
@@ -62,11 +104,16 @@ export class LeaderboardController {
   static updateLeaderboardEntry(req, res) {
     try {
       const { id } = req.params;
-      const entryData = req.body;
       
       // In a real application, this would update in a database
-      const leaderboardJson = process.leaderboardData || '[]';
-      const leaderboard = JSON.parse(leaderboardJson);
+      let leaderboard = [];
+      try {
+        const leaderboardJson = process.leaderboardData || '[]';
+        leaderboard = JSON.parse(leaderboardJson);
+      } catch (parseError) {
+        console.error('Error parsing leaderboard data:', parseError);
+        return res.status(500).json({ error: 'Internal server error' });
+      }
       
       const index = leaderboard.findIndex(entry => entry.id === id);
       
@@ -74,20 +121,19 @@ export class LeaderboardController {
         return res.status(404).json({ error: 'Leaderboard entry not found' });
       }
       
-      const updatedEntry = new LeaderboardModel({
+      // Update only the fields that are provided
+      const updatedEntry = {
         ...leaderboard[index],
-        ...entryData,
+        ...req.body,
         id // Ensure ID doesn't change
-      });
-      
-      // Calculate renewable percentage
-      updatedEntry.renewablePercentage = updatedEntry.calculateRenewablePercentage();
+      };
       
       leaderboard[index] = updatedEntry;
       process.leaderboardData = JSON.stringify(leaderboard);
       
       res.json(updatedEntry);
     } catch (error) {
+      console.error('Error in updateLeaderboardEntry:', error);
       res.status(400).json({ error: error.message });
     }
   }
@@ -102,8 +148,14 @@ export class LeaderboardController {
       const { id } = req.params;
       
       // In a real application, this would delete from a database
-      const leaderboardJson = process.leaderboardData || '[]';
-      const leaderboard = JSON.parse(leaderboardJson);
+      let leaderboard = [];
+      try {
+        const leaderboardJson = process.leaderboardData || '[]';
+        leaderboard = JSON.parse(leaderboardJson);
+      } catch (parseError) {
+        console.error('Error parsing leaderboard data:', parseError);
+        return res.status(500).json({ error: 'Internal server error' });
+      }
       
       const newLeaderboard = leaderboard.filter(entry => entry.id !== id);
       
@@ -115,6 +167,7 @@ export class LeaderboardController {
       
       res.status(204).send();
     } catch (error) {
+      console.error('Error in deleteLeaderboardEntry:', error);
       res.status(500).json({ error: error.message });
     }
   }
