@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Energy Tracker - Leaderboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <nav class="top-nav">
+      <ul>
+        <li><a href="/">Locations</a></li>
+        <li><a href="/leaderboard" class="active">Leaderboard</a></li>
+        <li><a href="/national-stats">National Stats</a></li>
+      </ul>
+    </nav>
+  
+    <h1>Leaderboard</h1>
+    
+    <div class="sorting-controls">
+      <label for="sort-select">Sorting by:</label>
+      <select id="sort-select">
+        <option value="renewable" selected>Highest Renewable %</option>
+        <option value="total">Total Energy</option>
+        <option value="state">State</option>
+      </select>
+    </div>
+    
+    <div class="leaderboard-container">
+      <table id="leaderboard-table">
+        <thead>
+          <tr>
+            <th>Location</th>
+            <th>State</th>
+            <th>Wind</th>
+            <th>Solar</th>
+            <th>Gas</th>
+            <th>Coal</th>
+            <th>Renewable %</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body">
+          <!-- Leaderboard entries will be inserted here -->
+        </tbody>
+      </table>
+    </div>
+    
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const leaderboardBody = document.getElementById('leaderboard-body');
+      const sortSelect = document.getElementById('sort-select');
+      
+      // Load leaderboard data
+      async function loadLeaderboard() {
+        try {
+          const response = await fetch('/api/leaderboard');
+          let entries = await response.json();
+          
+          // Sort entries
+          sortEntries(entries);
+          
+          // Render entries
+          renderEntries(entries);
+        } catch (error) {
+          console.error('Error loading leaderboard:', error);
+          leaderboardBody.innerHTML = '<tr><td colspan="8">Failed to load leaderboard data</td></tr>';
+        }
+      }
+      
+      // Sort entries based on selected sort option
+      function sortEntries(entries) {
+        const sortBy = sortSelect.value;
+        
+        switch (sortBy) {
+          case 'renewable':
+            entries.sort((a, b) => b.renewablePercentage - a.renewablePercentage);
+            break;
+          case 'total':
+            entries.sort((a, b) => b.totalEnergy - a.totalEnergy);
+            break;
+          case 'state':
+            entries.sort((a, b) => a.state.localeCompare(b.state));
+            break;
+        }
+      }
+      
+      // Render leaderboard entries
+      function renderEntries(entries) {
+        leaderboardBody.innerHTML = '';
+        
+        if (entries.length === 0) {
+          leaderboardBody.innerHTML = '<tr><td colspan="8">No entries found</td></tr>';
+          return;
+        }
+        
+        entries.forEach(entry => {
+          const row = document.createElement('tr');
+          
+          row.innerHTML = `
+            <td>${entry.locationName}</td>
+            <td>${entry.state}</td>
+            <td>${entry.energyBySource.wind.toFixed(2)}</td>
+            <td>${entry.energyBySource.solar.toFixed(2)}</td>
+            <td>${entry.energyBySource.gas.toFixed(2)}</td>
+            <td>${entry.energyBySource.coal.toFixed(2)}</td>
+            <td>${entry.renewablePercentage.toFixed(2)}%</td>
+            <td><button class="delete-button" data-id="${entry.id}">x</button></td>
+          `;
+          
+          // Add event listener for delete button
+          row.querySelector('.delete-button').addEventListener('click', async (e) => {
+            const id = e.target.getAttribute('data-id');
+            await deleteEntry(id);
+          });
+          
+          leaderboardBody.appendChild(row);
+        });
+      }
+      
+      // Delete leaderboard entry
+      async function deleteEntry(id) {
+        try {
+          const response = await fetch(`/api/leaderboard/${id}`, {
+            method: 'DELETE'
+          });
+          
+          if (response.ok) {
+            loadLeaderboard();
+          } else {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to delete entry');
+          }
+        } catch (error) {
+          console.error('Error deleting entry:', error);
+          alert(`Failed to delete entry: ${error.message}`);
+        }
+      }
+      
+      // Add event listeners
+      sortSelect.addEventListener('change', loadLeaderboard);
+      
+      
+      // Initial load
+      loadLeaderboard();
+    });
+  </script>
+</body>
+</html>
